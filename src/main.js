@@ -9,9 +9,9 @@ var rng = require('./rng');
 var WORLD = {
   gravity: -1000,
   width: 1280.0,
-  height: 800.0,
+  height: 600.0,
   phase: 1,
-  base: 800.0
+  base: 600.0
 };
 
 var GameObject = function(xPosition, yPosition, width, height, color, context) {
@@ -77,17 +77,16 @@ function setDimensions() {
 
   canvas.style.marginTop = rw <= rh ? String((window.innerHeight - canvas.height) / 2) + 'px' : 0;
 
-  ctx.scale(canvas.width / WORLD.width, canvas.height / WORLD.height);
-
+  ctx.scale(r, r);
 }
 
 setDimensions();
 
 window.onresize = setDimensions;
 
-var player = new Character(WORLD.width/ 2, WORLD.height - 50, 10, 20,'#0095DD', ctx);
-var player2 = new Character(WORLD.width/ 2, WORLD.height / 2, 10, 20,'#000000', ctx);
-var platform = new Platform(50, 50, 50, 10,'#0095DD', ctx);
+var player = new Character(WORLD.width/ 2, WORLD.height - 50, 20, 40,'#0095DD', ctx);
+var player2 = new Character(WORLD.width/ 2, WORLD.height / 2, 20, 40,'#000000', ctx);
+var platform = new Platform(100, 100, 100, 20,'#0095DD', ctx);
 
 /*
   
