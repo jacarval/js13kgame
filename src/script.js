@@ -7,7 +7,8 @@ var WORLD = {
   gravity: -1000,
   width: 1280.0,
   height: 800.0,
-  reverse: 
+  phase: 1,
+  base: 800.0
 };
 
 var scale = function() {
@@ -27,11 +28,14 @@ var GameObject = function(xPosition, yPosition, height, width, color, context) {
   this.moveDown = false;
 
   this.draw = function() {
+    ctx.save();
+    ctx.translate(-this.width/2, -this.height/2);
     ctx.beginPath();
     ctx.rect(this.xPosition, this.yPosition, this.width, this.height);
     ctx.fillStyle = color;
     ctx.fill();
     ctx.closePath();
+    ctx.restore();
   };
 };
 
@@ -84,7 +88,9 @@ setDimensions();
 window.onresize = setDimensions;
 
 var player = new Character(WORLD.width/ 2, WORLD.height - 50, 20, 10,'#0095DD', ctx);
-var player2 = new Character(WORLD.width/ 2, WORLD.height / 2, 20, 10,'#0095DD', ctx);
+var player2 = new Character(WORLD.width/ 2, WORLD.height / 2, 20, 10,'#000000', ctx);
+player2.jumpSpeed = WORLD.height;
+player2.gravity = -WORLD.gravity;
 var platform = new Platform(50, 50, 50, 10,'#0095DD', ctx);
 
 /*
@@ -142,7 +148,8 @@ function keyUpHandler(e) {
  */
 
 function reverse() {
-  player.jumpSpeed = -player.jumpSpeed;
+  WORLD.phase = -WORLD.phase;
+  // WORLD.base = WORLD.phase === -1 ? 0 : WORLD.height;
   WORLD.gravity = -WORLD.gravity;
 }
 
@@ -169,18 +176,14 @@ function updatePlayer(dt) {
     player2.yPosition -= (150 * dt);
   }
 
-  // console.log(player.yPosition + player.height, WORLD.height);
-  if (player.yPosition + player.height <= WORLD.height ){
-    // console.log(player.width);
-    player.yPosition += Math.min((player.jumpMomentum * dt), WORLD.height - player.yPosition - player.height);
-    player.jumpMomentum -= (player.gravity * dt);
-  }
+  player.yPosition += Math.min((player.jumpMomentum * dt), WORLD.base - player.yPosition - player.height / 2);
+  player.jumpMomentum = !(WORLD.base - player.yPosition - player.height / 2) ? 0 : player.jumpMomentum - (WORLD.gravity * dt);
 
-  if (player.yPosition >= 0){
-    // console.log(player.width);
-    player.yPosition -= Math.min((player.jumpMomentum * dt), WORLD.height - player.yPosition - player.height);
-    player.jumpMomentum += (player.gravity * dt);
-  }
+  player2.yPosition -= Math.max((player2.jumpMomentum * dt), 0);
+  player2.jumpMomentum += (player2.gravity * dt);
+
+
+  console.log(player.gravity, player.jumpMomentum, player.jumpSpeed);
 
 }
 
