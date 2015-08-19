@@ -11,15 +11,11 @@ var WORLD = {
   base: 800.0
 };
 
-var scale = function() {
-
-};
-
-var GameObject = function(xPosition, yPosition, height, width, color, context) {
+var GameObject = function(xPosition, yPosition, width, height, color, context) {
   this.xPosition = xPosition;
   this.yPosition = yPosition;
-  this.height = height;
   this.width = width;
+  this.height = height;
   this.color = color;
   this.ctx = context;
   this.moveLeft = false;
@@ -39,9 +35,9 @@ var GameObject = function(xPosition, yPosition, height, width, color, context) {
   };
 };
 
-var Character = function(xPosition, yPosition, height, width, color, context) {
-  GameObject.call(this, xPosition, yPosition, height, width, color, context);
-  this.jump = true;
+var Character = function(xPosition, yPosition, width, height, color, context) {
+  GameObject.call(this, xPosition, yPosition, width, height, color, context);
+  this.jump = false;
   this.jumpSpeed = -WORLD.height;
   this.jumpMomentum = 0;
   this.gravity = WORLD.gravity;
@@ -50,8 +46,8 @@ var Character = function(xPosition, yPosition, height, width, color, context) {
 Character.prototype = Object.create(GameObject.prototype);
 Character.prototype.constructor = Character;
 
-var Platform = function(xPosition, yPosition, height, width, color, context) {
-  GameObject.call(this, xPosition, yPosition, height, width, color, context);
+var Platform = function(xPosition, yPosition, width, height, color, context) {
+  GameObject.call(this, xPosition, yPosition, width, height, color, context);
 };
 
 Platform.prototype = Object.create(GameObject.prototype);
@@ -82,15 +78,12 @@ function setDimensions() {
 
 }
 
-
-// window.onresize = setDimensions;
 setDimensions();
+
 window.onresize = setDimensions;
 
-var player = new Character(WORLD.width/ 2, WORLD.height - 50, 20, 10,'#0095DD', ctx);
-var player2 = new Character(WORLD.width/ 2, WORLD.height / 2, 20, 10,'#000000', ctx);
-player2.jumpSpeed = WORLD.height;
-player2.gravity = -WORLD.gravity;
+var player = new Character(WORLD.width/ 2, WORLD.height - 50, 10, 20,'#0095DD', ctx);
+var player2 = new Character(WORLD.width/ 2, WORLD.height / 2, 10, 20,'#000000', ctx);
 var platform = new Platform(50, 50, 50, 10,'#0095DD', ctx);
 
 /*
@@ -161,29 +154,24 @@ function updatePlayer(dt) {
 
   if (player.moveLeft) {
     player.xPosition -= (150 * dt);
-    player2.xPosition += (150 * dt);
   }
   if (player.moveUp) {
     player.yPosition -= (150 * dt);
-    player2.yPosition += (150 * dt);
   }
   if (player.moveRight) {
     player.xPosition += (150 * dt);
-    player2.xPosition -= (150 * dt);
   }
   if (player.moveDown) {
     player.yPosition += (150 * dt);
-    player2.yPosition -= (150 * dt);
   }
 
   player.yPosition += Math.min((player.jumpMomentum * dt), WORLD.base - player.yPosition - player.height / 2);
   player.jumpMomentum = !(WORLD.base - player.yPosition - player.height / 2) ? 0 : player.jumpMomentum - (WORLD.gravity * dt);
 
-  player2.yPosition -= Math.max((player2.jumpMomentum * dt), 0);
-  player2.jumpMomentum += (player2.gravity * dt);
+  player2.yPosition = player.yPosition * -1 + WORLD.height;
+  player2.xPosition = player.xPosition * -1 + WORLD.width;
 
-
-  console.log(player.gravity, player.jumpMomentum, player.jumpSpeed);
+  console.log('jumpMomentum: ', player.jumpMomentum);
 
 }
 
