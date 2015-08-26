@@ -88,12 +88,8 @@ class Ball extends Circle {
 	}
 
 	intersects(b) {
-		console.log(this.x < b.x + b.width, this.x + this.width > b.x, this.y < b.y + b.height, this.y + this.height > b.y);
-	    return  this.x < b.x + b.width && 
-	            this.x + this.width > b.x &&
-	            this.y < b.y + b.height &&
-	            this.y + this.height > b.y;
-  }
+	    return this.x < b.x + b.width && this.x + this.r > b.x && this.y < b.y + b.height && this.y + this.r > b.y;
+  	}
 }
 
 module.exports.Polygon = Polygon;

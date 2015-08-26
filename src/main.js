@@ -16,8 +16,13 @@ window.onresize = setDimensions;
 window.ctx = ctx;
 
 var paddle = new Shapes.Platform(_C.PLATFORM_X, _C.PLATFORM_Y, _C.PLATFORM_WIDTH, _C.PLATFORM_HEIGHT, 'black');
-var ball = new Shapes.Ball(325, 325);
+var balls = [];
 var controller = new Controller(paddle, document, window);
+
+for (var i = 0; i < 250; i++) {
+  balls.push(new Shapes.Ball(Math.random() * 500 + 50, Math.random() * 500 + 50));
+}
+
 
 /*
   Resizes the canvas and scales everything
@@ -43,7 +48,7 @@ setDimensions();
  */
 function render() {
   paddle.draw();
-  ball.draw();
+  balls.map(function(ball){ball.draw();})
 };
 
 /*
@@ -67,7 +72,7 @@ function updatePaddle(dt) {
 /*
   Updates the positions of shapes on each animation
  */
-function updateBall(dt) {
+function updateBall(ball) {
 
   if (ball.x > WORLD.width || ball.x < 0) {
     ball.xVelocity *= -1.01;
@@ -77,8 +82,7 @@ function updateBall(dt) {
     ball.yVelocity *= -1.01;
   }
 
-  if (ball.intersects(paddle)) {
-    console.log('woo');
+  if (ball.intersects(paddle) && ball.yVelocity > 0) {
     ball.yVelocity *= -1.01;
   }
 
@@ -99,6 +103,6 @@ raf.start(function(elapsed) {
   // new Shapes.Circle(250, 250, 50, 'yellow');
 
   updatePaddle(elapsed);
-  updateBall(elapsed);
+  balls.map(function(ball){updateBall(ball);})
   render();
 });

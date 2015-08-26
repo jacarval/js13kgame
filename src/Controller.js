@@ -5,7 +5,7 @@ class Controller {
     this.obj = obj;
     document.addEventListener("keydown", this.keyDownHandler.bind(this), false);
     document.addEventListener("keyup", this.keyUpHandler.bind(this), false);
-    window.addEventListener('deviceorientation', this.handleOrientation.bind(this), true);
+    // window.addEventListener('deviceorientation', this.handleOrientation.bind(this), true);
   }
 
   handleOrientation(event) {
