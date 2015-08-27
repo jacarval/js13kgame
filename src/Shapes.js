@@ -7,6 +7,7 @@ class Movable {
 	constructor(x, y) {
 		this.x = x;
 		this.y = y;
+		this.rotation = 0;
 		this.moveLeft = false;
 	    this.moveUp = false;
 	    this.moveRight = false;
@@ -50,11 +51,17 @@ class Rectangle extends Movable {
 	}
 
 	draw() {
+		ctx.save();
 		ctx.beginPath();
-	    ctx.rect(this.x, this.y, this.width, this.height);
+		ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+		ctx.rotate(this.rotation * Math.PI / 180);
+		
+		
+	    ctx.rect(-this.width / 2, -this.height / 2, this.width, this.height);
 	    ctx.fillStyle = this.color;
 	    ctx.fill();
 	    ctx.closePath();
+	    ctx.restore();
 	}
 }
 
@@ -81,10 +88,10 @@ class Platform extends Rectangle {
 }
 
 class Ball extends Circle {
-	constructor(x, y) {
-		super(x, y, 10, 'red');
+	constructor(x, y, color) {
+		super(x, y, 10, color);
 	    this.xVelocity = 1;
-	    this.yVelocity = -4;
+	    this.yVelocity = 4;
 	}
 
 	intersects(b) {

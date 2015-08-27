@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO test</title>
+    <script src="/socket.io/socket.io.js"></script>
+  </head>
+  <body>
+    <p>Hello, World!</p>
+    <div id='button'>
+
+    </div>
+  </body>
+  <script>
+var socket = io();
+
+socket.emit('phone-create:paddle', "hello");
+
+window.addEventListener('deviceorientation', handleOrientation, true);
+
+function handleOrientation(event) {
+  socket.emit('phone-orientation-event', event);
+}
+
+window.addEventListener('devicemotion', handleMotion, true);
+
+function handleMotion(event) {
+  socket.emit('motion-event', event);
+}
+
+
+window.addEventListener('touchstart', handleTouch, false);
+
+function handleTouch(event) {
+  socket.emit('phone-touch-event', event);
+}
+
+
+  </script>
+</html>

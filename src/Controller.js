@@ -3,22 +3,35 @@
 class Controller {
   constructor(obj, document, window){
     this.obj = obj;
+    this.counter = 0;
     document.addEventListener("keydown", this.keyDownHandler.bind(this), false);
     document.addEventListener("keyup", this.keyUpHandler.bind(this), false);
     // window.addEventListener('deviceorientation', this.handleOrientation.bind(this), true);
   }
 
+  scaleValue(value, sMin, sMax, min, max) {
+    return (sMax - sMin) * (value - min) / (max - min) + sMin;
+  }
+
   handleOrientation(event) {
-    var gamma = event.gamma + 90;
+    var alpha = -(event.alpha + 30) % 60  // twist/compass
+    var beta = -event.beta;    // tilt
+    var gamma = event.gamma; // rotation
 
-    var x = gamma;
+    var x = this.scaleValue(alpha, 0, 800, -60, 0);
+    var y = this.scaleValue(beta, 0, 600, -45, 15);
 
-    var r = 800 / 180;
+    // console.log(alpha, beta, gamma);
 
-    // console.log(gamma);
-    // console.log(gamma);
+    this.obj.x = x;
+    this.obj.y = y;
+    this.obj.rotation = gamma;
+  }
 
-    this.obj.x = (x * r - 50);
+  handleTouch(event) {
+    var colors = ['red', 'blue', 'green', 'yellow'];
+    this.obj.color = colors[this.counter];
+    this.counter = (this.counter + 1) % 4;
   }
 
   keyDownHandler(e) {

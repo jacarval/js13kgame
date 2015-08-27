@@ -56,7 +56,7 @@ gulp.task('build_source', function() {
 });
 
 gulp.task('build_index', function() {
-  return gulp.src('src/index.html')
+  return gulp.src(['src/index.html', 'src/mobile.html'])
     .pipe(gulpif(prod, htmlmin({
       collapseWhitespace: true,
       removeAttributeQuotes: true,
@@ -100,7 +100,7 @@ gulp.task('dist', ['build'], function() {
 gulp.task('watch', function() {
   gulp.watch('src/**/*.js', ['lint', 'build_source']);
   gulp.watch('src/styles.less', ['build_styles']);
-  gulp.watch('src/index.html', ['build_index']);
+  gulp.watch('src/*.html', ['build_index']);
 });
 
 gulp.task('serve', ['build'], function() {

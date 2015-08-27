@@ -1,10 +1,10 @@
 var WORLD = {
-  gravity: -1000,
+  gravity: -500,
   width: 800.0,
   height: 600.0,
   phase: 1,
   base: 600.0
-}
+};
 
 var CONSTANTS = {
   PLATFORM_WIDTH: 100,

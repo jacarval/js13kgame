@@ -2,26 +2,50 @@
 /*jshint strict: true */
 /*jslint node: true */
 
-"use strict";
+'use strict';
 var raf = require('./raf');
 var rng = require('./rng');
 var WORLD = require('./Constants').WORLD;
 var _C = require('./Constants').CONSTANTS;
 var Shapes = require('./Shapes');
-var Controller = require('./Controller');
+var socket = io();
+
 
 var canvas = document.querySelector('#game');
 var ctx = canvas.getContext('2d');
 window.onresize = setDimensions;
 window.ctx = ctx;
 
-var paddle = new Shapes.Platform(_C.PLATFORM_X, _C.PLATFORM_Y, _C.PLATFORM_WIDTH, _C.PLATFORM_HEIGHT, 'black');
+var paddles = {};
+var controllers = {};
 var balls = [];
-var controller = new Controller(paddle, document, window);
+var score = 10;
 
-for (var i = 0; i < 250; i++) {
-  balls.push(new Shapes.Ball(Math.random() * 500 + 50, Math.random() * 500 + 50));
+var paddleFactory = new (require('./AssetFactory')).PaddleFactory(document, window, paddles, controllers);
+var ballFactory = new (require('./AssetFactory')).BallFactory(balls);
+
+for (var i = 0; i < 5; i++) {
+  ballFactory.createNewBall('red');
 }
+
+
+
+socket.on('create:paddle', function(id){
+  paddleFactory.createNewPaddle(id);
+});
+
+socket.on('orientation-event', function(event, id) {
+  if (controllers[id]) {
+    controllers[id].handleOrientation(event);
+  }
+});
+
+ 
+socket.on('touch-event', function(event, id) {
+  var paddle = paddles[id];
+  controllers[id].handleTouch(event);
+  ballFactory.createNewBall(paddle.color);
+});
 
 
 /*
@@ -39,7 +63,7 @@ function setDimensions() {
   canvas.style.marginTop = rw <= rh ? String((window.innerHeight - canvas.height) / 2) + 'px' : 0;
 
   ctx.scale(r, r);
-};
+}
 
 setDimensions();
 
@@ -47,48 +71,50 @@ setDimensions();
   Draws the shapes on each frame animation
  */
 function render() {
-  paddle.draw();
-  balls.map(function(ball){ball.draw();})
-};
+
+  for (var id in paddles) {
+    paddles[id].draw();
+  }
+
+  balls.map(function(ball){
+    ball.draw();
+  });
+
+}
 
 /*
   Updates the positions of shapes on each animation
  */
-function updatePaddle(dt) {
-  if (paddle.moveLeft) {
-    paddle.move(-150 * dt, 0) ;
-  }
-  if (paddle.moveUp) {
-    paddle.move(0, -150 * dt);
-  }
-  if (paddle.moveRight) {
-    paddle.move(150 * dt, 0);
-  }
-  if (paddle.moveDown) {
-    paddle.move(0, 150 * dt);
-  }
-};
+function updateBalls(dt) {
 
-/*
-  Updates the positions of shapes on each animation
- */
-function updateBall(ball) {
+  balls.forEach(function(ball, index){
 
-  if (ball.x > WORLD.width || ball.x < 0) {
-    ball.xVelocity *= -1.01;
-  }
+    if (ball.x > WORLD.width || ball.x < 0) {
+      ball.xVelocity *= -0.999;
+    }
 
-  if (ball.y >= WORLD.height || ball.y <= 0) {
-    ball.yVelocity *= -1.01;
-  }
+    if (ball.y <= 0) {
+      ball.yVelocity *= -0.999;
+    }
 
-  if (ball.intersects(paddle) && ball.yVelocity > 0) {
-    ball.yVelocity *= -1.01;
-  }
+    if (ball.y >= WORLD.height) {
+      balls.splice(index, 1);
+      score--;
+      console.log(score);
+    }
 
-  ball.move(ball.xVelocity, ball.yVelocity);
+    for (var id in paddles) {
+      if (ball.intersects(paddles[id])) {
+        ball.yVelocity *= -1.1;
+      }
+    }
 
-};
+    ball.yVelocity = ball.yVelocity - (WORLD.gravity * dt);
+    ball.move(ball.xVelocity, ball.yVelocity * dt);
+
+  });
+
+}
 
 /*
   Animates the frame based on the time elapsed between animations
@@ -96,13 +122,33 @@ function updateBall(ball) {
 raf.start(function(elapsed) {
   ctx.clearRect(0, 0, WORLD.width, WORLD.height);
 
-  // new Shapes.Polygon([ [5,5], [100,50], [50,100], [10,90] ], 'red');
-  // new Shapes.Polygon([ [42,27], [66,20], [73,57], [48,62] ], 'blue');
-  // new Shapes.Triangle(500, 500, 'green');
-  // new Shapes.Rectangle(300, 300, 200, 100, 'black');
-  // new Shapes.Circle(250, 250, 50, 'yellow');
-
-  updatePaddle(elapsed);
-  balls.map(function(ball){updateBall(ball);})
+  updateBalls(elapsed);
   render();
+  if (score === 0) {
+    alert("You Lose!");
+    score = 10;
+  }
 });
+
+
+
+/*
+  Updates the positions of shapes on each animation
+ */
+// function updatePaddle(dt) {
+//   if (paddle.moveLeft) {
+//     paddle.move(-150 * dt, 0) ;
+//   }
+//   if (paddle.moveUp) {
+//     paddle.move(0, -150 * dt);
+//   }
+//   if (paddle.moveRight) {
+//     paddle.move(150 * dt, 0);
+//   }
+//   if (paddle.moveDown) {
+//     paddle.move(0, 150 * dt);
+//   }
+// };
+
+
+
