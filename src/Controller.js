@@ -14,9 +14,9 @@ class Controller {
   }
 
   handleOrientation(event) {
-    var alpha = -(event.alpha + 30) % 60  // twist/compass
-    var beta = -event.beta;    // tilt
-    var gamma = event.gamma; // rotation
+    var alpha = -(event.alpha + 30) % 60  // compass
+    var beta = -event.beta;               // tilt
+    var gamma = event.gamma;              // rotation
 
     var x = this.scaleValue(alpha, 0, 800, -60, 0);
     var y = this.scaleValue(beta, 0, 600, -45, 15);

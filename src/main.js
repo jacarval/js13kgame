@@ -124,10 +124,6 @@ raf.start(function(elapsed) {
 
   updateBalls(elapsed);
   render();
-  if (score === 0) {
-    alert("You Lose!");
-    score = 10;
-  }
 });
 
 
