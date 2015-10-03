@@ -106,6 +106,7 @@ function updateBalls(dt) {
     for (var id in paddles) {
       if (ball.intersects(paddles[id])) {
         ball.yVelocity *= -1.1;
+        ball.xVelocity *= Math.random() * -2
       }
     }
 
